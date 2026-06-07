@@ -39,7 +39,20 @@ jobs:
           fi
 
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --no-tree-shake-icons
+
+      - name: Locate and Move APK
+        run: |
+          echo "Searching for APK..."
+          APK_PATH=$(find build/app/outputs -name "*.apk" | grep "release" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "APK not found!"
+            exit 1
+          fi
+          echo "Found APK at: $APK_PATH"
+          mkdir -p build/app/outputs/flutter-apk/
+          cp "$APK_PATH" build/app/outputs/flutter-apk/app-release.apk
+          echo "APK moved to build/app/outputs/flutter-apk/app-release.apk"
 
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v1
