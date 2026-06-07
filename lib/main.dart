@@ -1,4 +1,3 @@
-```dart
 import 'package:flutter/material.dart';
 import 'package:code_editor_android/screens/home_screen.dart';
 
@@ -21,4 +20,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-```
