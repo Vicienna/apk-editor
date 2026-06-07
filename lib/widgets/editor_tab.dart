@@ -106,10 +106,10 @@ class _EditorTabState extends State<EditorTab> {
     if (text.isEmpty) return const Text('');
 
     final List<TextSpan> spans = [];
-    
-    // Kita pecah teks jadi kata-kata untuk pewarnaan simpel
-    final words = text.splitMapJoin(
-      RegExp(r'(\s+)|(\".*?\"|\'.*?\')|(\/\/.*$)|(\b(if|else|for|while|return|class|def|function|import|export|var|let|const|async|await|try|catch|final|static|void|int|String|bool)\b)'),
+
+    // Menggunakan triple-quotes r'''...''' agar simbol kutip dan $ aman dibaca oleh Dart
+    text.splitMapJoin(
+      RegExp(r'''(\s+)|(".*?"|'.*?')|(\/\/.*$)|(\b(if|else|for|while|return|class|def|function|import|export|var|let|const|async|await|try|catch|final|static|void|int|String|bool)\b)'''),
       onMatch: (Match match) {
         String matchText = match.group(0)!;
         Color color = Colors.white;
@@ -117,7 +117,7 @@ class _EditorTabState extends State<EditorTab> {
         if (match.group(2) != null) color = Colors.greenAccent; // Strings
         else if (match.group(3) != null) color = Colors.grey; // Comments
         else if (match.group(4) != null) color = Colors.orangeAccent; // Keywords
-        
+
         spans.add(TextSpan(
           text: matchText,
           style: TextStyle(color: color, fontFamily: 'monospace', fontSize: 14),
