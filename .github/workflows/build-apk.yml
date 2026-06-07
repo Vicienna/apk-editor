@@ -39,20 +39,25 @@ jobs:
           fi
 
       - name: Build APK
-        run: flutter build apk --release --no-tree-shake-icons
+        # Kita tambahkan '|| true' supaya kalau Flutter tool error 'not found apk', 
+        # workflow tetap lanjut ke step pencarian manual.
+        run: flutter build apk --release --no-tree-shake-icons || true
 
-      - name: Locate and Move APK
+      - name: Force Locate and Move APK
         run: |
-          echo "Searching for APK..."
-          APK_PATH=$(find build/app/outputs -name "*.apk" | grep "release" | head -n 1)
+          echo "Searching for APK in all build directories..."
+          # Cari semua file .apk di folder build
+          APK_PATH=$(find build -name "*.apk" | grep "release" | head -n 1)
+          
           if [ -z "$APK_PATH" ]; then
-            echo "APK not found!"
+            echo "CRITICAL ERROR: APK really not found anywhere in build folder!"
             exit 1
           fi
+          
           echo "Found APK at: $APK_PATH"
           mkdir -p build/app/outputs/flutter-apk/
           cp "$APK_PATH" build/app/outputs/flutter-apk/app-release.apk
-          echo "APK moved to build/app/outputs/flutter-apk/app-release.apk"
+          echo "Successfully forced APK to build/app/outputs/flutter-apk/app-release.apk"
 
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v1
