@@ -1,4 +1,3 @@
-```yaml
 name: code_editor_android
 description: A simple code editor for Android with GitHub integration.
 publish_to: "none"
@@ -24,4 +23,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-```
