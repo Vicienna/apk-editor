@@ -39,7 +39,7 @@ jobs:
           fi
 
       - name: Build APK
-        run: flutter build apk --release --no-tree-shake-icons
+        run: flutter build apk --release
 
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v1
