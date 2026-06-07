@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initApp() async {
-    await _storage.init();
+    await _storage.init(); // Pastikan SharedPreferences siap
     await _loadInitialFile();
   }
 
