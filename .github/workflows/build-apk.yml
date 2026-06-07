@@ -39,34 +39,9 @@ jobs:
           fi
 
       - name: Build APK
-        # Kita hapus '|| true' dan pakai build standar. 
-        # Jika gagal di sini, kita akan tahu penyebab aslinya.
         run: flutter build apk --release --no-tree-shake-icons
 
-      - name: Debug Build Folder
-        if: always()
-        run: |
-          echo "Listing all files in build directory to find APK..."
-          find . -name "*.apk"
-
-      - name: Force Locate and Move APK
-        if: always()
-        run: |
-          echo "Searching for APK..."
-          APK_PATH=$(find . -name "*.apk" | grep "release" | head -n 1)
-          
-          if [ -z "$APK_PATH" ]; then
-            echo "CRITICAL ERROR: APK not found in any directory!"
-            exit 1
-          fi
-          
-          echo "Found APK at: $APK_PATH"
-          mkdir -p build/app/outputs/flutter-apk/
-          cp "$APK_PATH" build/app/outputs/flutter-apk/app-release.apk
-          echo "Successfully moved APK to build/app/outputs/flutter-apk/app-release.apk"
-
       - name: Create Release and Upload APK
-        if: success()
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.run_number }}
@@ -76,3 +51,4 @@ jobs:
           files: build/app/outputs/flutter-apk/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
