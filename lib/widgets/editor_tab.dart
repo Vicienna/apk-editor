@@ -1,4 +1,3 @@
-```dart
 import 'package:flutter/material.dart';
 import 'package:highlight/highlight.dart';
 
@@ -93,4 +92,3 @@ class _EditorTabState extends State<EditorTab> {
     );
   }
 }
-```
