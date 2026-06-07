@@ -1,4 +1,3 @@
-```dart
 import 'package:flutter/material.dart';
 import 'package:code_editor_android/services/storage_service.dart';
 
@@ -98,4 +97,3 @@ class _SettingsDialogState extends State<SettingsDialog> {
     super.dispose();
   }
 }
-```
