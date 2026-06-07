@@ -1,4 +1,3 @@
-```dart
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +8,6 @@ class StorageService {
   static const _patKey = 'github_pat';
   static const _repoKey = 'github_repo';
 
-  // Inisialisasi prefs
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
   }
@@ -50,6 +48,11 @@ class StorageService {
     return await File(path).readAsString();
   }
 
+  // Tambahin ini biar home_screen.dart nggak error
+  String readFileSync(String path) {
+    return File(path).readAsStringSync();
+  }
+
   Future<void> writeFile(String path, String content) async {
     await File(path).writeAsString(content);
   }
@@ -70,4 +73,3 @@ class StorageService {
     return _prefs?.getString(_repoKey);
   }
 }
-```
