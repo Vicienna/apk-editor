@@ -1,4 +1,3 @@
-```dart
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:code_editor_android/services/storage_service.dart';
@@ -41,4 +40,3 @@ class FileExplorer extends StatelessWidget {
     return dir.listSync().toList();
   }
 }
-```
