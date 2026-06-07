@@ -105,46 +105,33 @@ class _EditorTabState extends State<EditorTab> {
     final text = _controller.text;
     if (text.isEmpty) return const Text('');
 
-    // Regex sederhana untuk pewarnaan dasar (Keyword, String, Comment)
     final List<TextSpan> spans = [];
-    final RegExp regex = RegExp(
-      r'(\b(if|else|for|while|return|class|def|function|import|export|var|let|const|async|await|try|catch|final|static|void|int|String|bool\b))|'
-      r'("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\')|'
-      r'(\/\/.*$)',
-      multiline: true,
-    );
+    
+    // Kita pecah teks jadi kata-kata untuk pewarnaan simpel
+    final words = text.splitMapJoin(
+      RegExp(r'(\s+)|(\".*?\"|\'.*?\')|(\/\/.*$)|(\b(if|else|for|while|return|class|def|function|import|export|var|let|const|async|await|try|catch|final|static|void|int|String|bool)\b)'),
+      onMatch: (Match match) {
+        String matchText = match.group(0)!;
+        Color color = Colors.white;
 
-    int lastIndex = 0;
-    for (final Match match in regex.allMatches(text)) {
-      // Teks biasa sebelum match
-      if (match.start > lastIndex) {
+        if (match.group(2) != null) color = Colors.greenAccent; // Strings
+        else if (match.group(3) != null) color = Colors.grey; // Comments
+        else if (match.group(4) != null) color = Colors.orangeAccent; // Keywords
+        
         spans.add(TextSpan(
-          text: text.substring(lastIndex, match.start),
+          text: matchText,
+          style: TextStyle(color: color, fontFamily: 'monospace', fontSize: 14),
+        ));
+        return '';
+      },
+      onNonMatch: (String nonMatch) {
+        spans.add(TextSpan(
+          text: nonMatch,
           style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 14),
         ));
-      }
-
-      // Teks yang match
-      String matchText = match.group(0)!;
-      Color color = Colors.white;
-
-      if (match.group(1) != null) color = Colors.orangeAccent; // Keywords
-      else if (match.group(2) != null) color = Colors.greenAccent; // Strings
-      else if (match.group(3) != null) color = Colors.grey; // Comments
-
-      spans.add(TextSpan(
-        text: matchText,
-        style: TextStyle(color: color, fontFamily: 'monospace', fontSize: 14),
-      ));
-      lastIndex = match.end;
-    }
-
-    if (lastIndex < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(lastIndex),
-        style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 14),
-      ));
-    }
+        return '';
+      },
+    );
 
     return RichText(
       text: TextSpan(children: spans),
