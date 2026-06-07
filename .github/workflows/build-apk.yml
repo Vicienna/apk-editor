@@ -1,0 +1,53 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+
+      - name: Clean and Install dependencies
+        run: |
+          flutter clean
+          flutter pub get
+
+      - name: Patch Android configuration
+        run: |
+          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+          if ! grep -q "flutter {" android/app/build.gradle; then
+            echo -e "\nflutter {\n    source '../..'\n}" >> android/app/build.gradle
+          fi
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Create Release and Upload APK
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          draft: false
+          prerelease: false
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
