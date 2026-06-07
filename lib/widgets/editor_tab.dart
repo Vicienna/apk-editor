@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:highlight/highlight.dart';
 
 class EditorTab extends StatefulWidget {
   final String filePath;
@@ -73,7 +72,7 @@ class _EditorTabState extends State<EditorTab> {
                 Positioned.fill(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(10),
-                    child: _buildHighlightedText(),
+                    child: _buildSimpleHighlightedText(),
                   ),
                 ),
                 TextField(
@@ -102,41 +101,53 @@ class _EditorTabState extends State<EditorTab> {
     );
   }
 
-  Widget _buildHighlightedText() {
-    final code = _controller.text;
-    final extension = widget.filePath.split('.').last;
-    
-    // Gunakan mapping manual untuk bahasa agar tidak error API
-    var lang = highlight.dart;
-    if (extension == 'js') lang = highlight.javascript;
-    if (extension == 'py') lang = highlight.python;
-    if (extension == 'html') lang = highlight.html;
-    if (extension == 'css') lang = highlight.css;
+  Widget _buildSimpleHighlightedText() {
+    final text = _controller.text;
+    if (text.isEmpty) return const Text('');
 
-    final highlighted = highlight.parse(code, lang);
-    
-    return RichText(
-      text: TextSpan(
-        children: highlighted.elements.map((element) {
-          return TextSpan(
-            text: element.text,
-            style: TextStyle(
-              color: _getColorForStyle(element.style),
-              fontFamily: 'monospace',
-              fontSize: 14,
-            ),
-          );
-        }).toList(),
-      ),
+    // Regex sederhana untuk pewarnaan dasar (Keyword, String, Comment)
+    final List<TextSpan> spans = [];
+    final RegExp regex = RegExp(
+      r'(\b(if|else|for|while|return|class|def|function|import|export|var|let|const|async|await|try|catch|final|static|void|int|String|bool\b))|'
+      r'("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\')|'
+      r'(\/\/.*$)',
+      multiline: true,
     );
-  }
 
-  Color _getColorForStyle(highlight.Style style) {
-    if (style == highlight.Style.keyword) return Colors.orangeAccent;
-    if (style == highlight.Style.string) return Colors.greenAccent;
-    if (style == highlight.Style.comment) return Colors.grey;
-    if (style == highlight.Style.number) return Colors.lightBlueAccent;
-    if (style == highlight.Style.function) return Colors.yellowAccent;
-    return Colors.white;
+    int lastIndex = 0;
+    for (final Match match in regex.allMatches(text)) {
+      // Teks biasa sebelum match
+      if (match.start > lastIndex) {
+        spans.add(TextSpan(
+          text: text.substring(lastIndex, match.start),
+          style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 14),
+        ));
+      }
+
+      // Teks yang match
+      String matchText = match.group(0)!;
+      Color color = Colors.white;
+
+      if (match.group(1) != null) color = Colors.orangeAccent; // Keywords
+      else if (match.group(2) != null) color = Colors.greenAccent; // Strings
+      else if (match.group(3) != null) color = Colors.grey; // Comments
+
+      spans.add(TextSpan(
+        text: matchText,
+        style: TextStyle(color: color, fontFamily: 'monospace', fontSize: 14),
+      ));
+      lastIndex = match.end;
+    }
+
+    if (lastIndex < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(lastIndex),
+        style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 14),
+      ));
+    }
+
+    return RichText(
+      text: TextSpan(children: spans),
+    );
   }
 }
