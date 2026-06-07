@@ -106,13 +106,14 @@ class _EditorTabState extends State<EditorTab> {
     final code = _controller.text;
     final extension = widget.filePath.split('.').last;
     
-    var language = highlight.language.dart;
-    if (extension == 'js') language = highlight.language.javascript;
-    if (extension == 'py') language = highlight.language.python;
-    if (extension == 'html') language = highlight.language.html;
-    if (extension == 'css') language = highlight.language.css;
+    // Gunakan mapping manual untuk bahasa agar tidak error API
+    var lang = highlight.dart;
+    if (extension == 'js') lang = highlight.javascript;
+    if (extension == 'py') lang = highlight.python;
+    if (extension == 'html') lang = highlight.html;
+    if (extension == 'css') lang = highlight.css;
 
-    final highlighted = highlight.parse(code, language);
+    final highlighted = highlight.parse(code, lang);
     
     return RichText(
       text: TextSpan(
@@ -131,13 +132,11 @@ class _EditorTabState extends State<EditorTab> {
   }
 
   Color _getColorForStyle(highlight.Style style) {
-    switch (style) {
-      case highlight.Style.keyword: return Colors.orangeAccent;
-      case highlight.Style.string: return Colors.greenAccent;
-      case highlight.Style.comment: return Colors.grey;
-      case highlight.Style.number: return Colors.lightBlueAccent;
-      case highlight.Style.function: return Colors.yellowAccent;
-      default: return Colors.white;
-    }
+    if (style == highlight.Style.keyword) return Colors.orangeAccent;
+    if (style == highlight.Style.string) return Colors.greenAccent;
+    if (style == highlight.Style.comment) return Colors.grey;
+    if (style == highlight.Style.number) return Colors.lightBlueAccent;
+    if (style == highlight.Style.function) return Colors.yellowAccent;
+    return Colors.white;
   }
 }
