@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:highlight/highlight.dart';
-import 'package:highlight/languages.dart';
 
 class EditorTab extends StatefulWidget {
   final String filePath;
@@ -54,7 +53,6 @@ class _EditorTabState extends State<EditorTab> {
       color: Colors.grey[900],
       child: Row(
         children: [
-          // Line Numbers
           Container(
             width: 40,
             color: Colors.black,
@@ -69,25 +67,22 @@ class _EditorTabState extends State<EditorTab> {
               },
             ),
           ),
-          // Code Area
           Expanded(
             child: Stack(
               children: [
-                // Syntax Highlighting Layer (Read-only)
                 Positioned.fill(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(10),
                     child: _buildHighlightedText(),
                   ),
                 ),
-                // Input Layer (Transparent text)
                 TextField(
                   controller: _controller,
                   focusNode: _focusNode,
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
                   style: const TextStyle(
-                    color: Colors.transparent, // Sembunyikan teks asli
+                    color: Colors.transparent,
                     fontFamily: 'monospace',
                     fontSize: 14,
                   ),
@@ -111,12 +106,11 @@ class _EditorTabState extends State<EditorTab> {
     final code = _controller.text;
     final extension = widget.filePath.split('.').last;
     
-    // Pilih bahasa berdasarkan ekstensi
-    var language = highlight.languageDart;
-    if (extension == 'js') language = highlight.languageJavaScript;
-    if (extension == 'py') language = highlight.languagePython;
-    if (extension == 'html') language = highlight.languageHtml;
-    if (extension == 'css') language = highlight.languageCss;
+    var language = highlight.language.dart;
+    if (extension == 'js') language = highlight.language.javascript;
+    if (extension == 'py') language = highlight.language.python;
+    if (extension == 'html') language = highlight.language.html;
+    if (extension == 'css') language = highlight.language.css;
 
     final highlighted = highlight.parse(code, language);
     
