@@ -1,4 +1,3 @@
-```dart
 import 'package:flutter/material.dart';
 import 'package:code_editor_android/services/storage_service.dart';
 import 'package:code_editor_android/services/github_service.dart';
@@ -28,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initApp() async {
-    await _storage.init(); // Pastikan SharedPreferences siap
+    await _storage.init();
     await _loadInitialFile();
   }
 
@@ -147,4 +146,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-```
