@@ -1,15 +1,15 @@
+```dart
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class StorageService {
-  late SharedPreferences _prefs;
-  final _secureStorage = const FlutterSecureStorage();
+  SharedPreferences? _prefs;
 
   static const _patKey = 'github_pat';
   static const _repoKey = 'github_repo';
 
+  // Inisialisasi prefs
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
   }
@@ -23,27 +23,27 @@ class StorageService {
     if (!await dir.exists()) {
       await dir.create(recursive: true);
     }
-    final entities = dir.listSync();
-    for (var e in entities) {
-      if (e is File && 
-          (e.path.endsWith('.dart') ||
-           e.path.endsWith('.js') ||
-           e.path.endsWith('.ts') ||
-           e.path.endsWith('.py') ||
-           e.path.endsWith('.java') ||
-           e.path.endsWith('.kt') ||
-           e.path.endsWith('.cpp') ||
-           e.path.endsWith('.c') ||
-           e.path.endsWith('.html') ||
-           e.path.endsWith('.css'))) {
-        return e.path;
+    try {
+      final entities = dir.listSync();
+      for (var e in entities) {
+        if (e is File && 
+            (e.path.endsWith('.dart') ||
+             e.path.endsWith('.js') ||
+             e.path.endsWith('.ts') ||
+             e.path.endsWith('.py') ||
+             e.path.endsWith('.java') ||
+             e.path.endsWith('.kt') ||
+             e.path.endsWith('.cpp') ||
+             e.path.endsWith('.c') ||
+             e.path.endsWith('.html') ||
+             e.path.endsWith('.css'))) {
+          return e.path;
+        }
       }
+    } catch (e) {
+      print('Error listing files: $e');
     }
     return null;
-  }
-
-  String readFileSync(String path) {
-    return File(path).readAsStringSync();
   }
 
   Future<String> readFile(String path) async {
@@ -55,18 +55,19 @@ class StorageService {
   }
 
   Future<void> setPat(String pat) async {
-    await _prefs.setString(_patKey, pat);
+    await _prefs?.setString(_patKey, pat);
   }
 
   Future<String?> getPat() async {
-    return _prefs.getString(_patKey);
+    return _prefs?.getString(_patKey);
   }
 
   Future<void> setGitHubRepo(String repo) async {
-    await _prefs.setString(_repoKey, repo);
+    await _prefs?.setString(_repoKey, repo);
   }
 
   Future<String?> getGitHubRepo() async {
-    return _prefs.getString(_repoKey);
+    return _prefs?.getString(_repoKey);
   }
 }
+```
