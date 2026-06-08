@@ -1,8 +1,10 @@
 name: Build and Release APK
 
+# Hanya jalan saat lu push tag yang diawali 'v' (contoh: v1.0.0, v2.0.1)
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -13,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Penting biar tag history tersedia
 
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -31,34 +35,28 @@ jobs:
           flutter clean
           flutter pub get
 
-      - name: Prepare local.properties
+      - name: Patch Android configuration
         run: |
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
-
-      - name: Build APK (Bypass Path Check)
-        run: |
-          # Jalankan build, jika Flutter menganggap gagal hanya karena salah jalur, tetap lanjutkan script
-          flutter build apk --release || true
-          
-          # Validasi apakah file APK benar-benar buatan Gradle ada di suatu tempat
-          echo "--- Mencari lokasi asli file APK ---"
-          find . -name "*.apk"
-          
-          # Jika tidak ada APK sama sekali yang terbentuk, barulah gagalkan workflow
-          if [ -z "$(find . -name '*.apk' -not -path '*/intermediates/*')" ]; then
-            echo "Eror: Gradle benar-benar gagal membuat APK!"
-            exit 1
+          if ! grep -q "flutter {" android/app/build.gradle; then
+            echo -e "\nflutter {\n    source '../..'\n}" >> android/app/build.gradle
           fi
 
+      - name: Generate App Icons
+        run: flutter pub run flutter_launcher_icons:main
+
+      - name: Build APK
+        run: flutter build apk --release
+
       - name: Create Release and Upload APK
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ github.run_number }}
-          name: Release v${{ github.run_number }}
+          # Ambil nama tag asli (misal: v1.0.0)
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
-          files: |
-            build/app/outputs/flutter-apk/*.apk
-            android/app/build/outputs/apk/release/*.apk
+          files: build/app/outputs/flutter-apk/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
