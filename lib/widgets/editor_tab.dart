@@ -107,9 +107,10 @@ class _EditorTabState extends State<EditorTab> {
 
     final List<TextSpan> spans = [];
     
-    // Regex aman: whitespace | string (double/single quote) | comment | keywords
+    // Regex SIMPLE & AMAN: whitespace | string | comment | keyword
+    // TANPA $ (pakai multiLine: true biar .* match sampai newline)
     final pattern = RegExp(
-      r'(\s+)|(".*?"|\'.*?\')|(//.*$)|(\b(if|else|for|while|return|class|def|function|import|export|var|let|const|async|await|try|catch|final|static|void|int|String|bool)\b)',
+      r'(\s+)|(".*?"|\'.*?\')|(//.*)|(\b(if|else|for|while|return|class|def|function|import|export|var|let|const|async|await|try|catch|final|static|void|int|String|bool)\b)',
       multiLine: true,
       dotAll: true,
     );
