@@ -4,7 +4,7 @@ class EditorTab extends StatefulWidget {
   final String filePath;
   final String content;
   final Function(String) onContentChanged;
-
+  
   const EditorTab({
     super.key,
     required this.filePath,
@@ -14,7 +14,7 @@ class EditorTab extends StatefulWidget {
 
   @override
   State<EditorTab> createState() => _EditorTabState();
-}
+}                                                                     
 
 class _EditorTabState extends State<EditorTab> {
   late TextEditingController _controller;
@@ -106,10 +106,10 @@ class _EditorTabState extends State<EditorTab> {
     if (text.isEmpty) return const Text('');
 
     final List<TextSpan> spans = [];
-    
-    // RAW STRING PAKAI PETIK DUA r"..." -> AMAN UNTUK PETIK SATU DI DALAMNYA
+
+    // FIXED: Menggunakan triple-quotes r'''...''' agar bebas konflik tanda kutip
     final pattern = RegExp(
-      r"(\s+)|(\".*?\"|'.*?')|(//.*)|(\b(if|else|for|while|return|class|def|function|import|export|var|let|const|async|await|try|catch|final|static|void|int|String|bool)\b)",
+      r'''(\s+)|(".*?"|'.*?')|(//.*)|(\b(if|else|for|while|return|class|def|function|import|export|var|let|const|async|await|try|catch|final|static|void|int|String|bool)\b)''',
       multiLine: true,
       dotAll: true,
     );
@@ -123,7 +123,7 @@ class _EditorTabState extends State<EditorTab> {
         if (match.group(2) != null) color = Colors.greenAccent;      // Strings
         else if (match.group(3) != null) color = Colors.grey;        // Comments
         else if (match.group(4) != null) color = Colors.orangeAccent; // Keywords
-        
+
         spans.add(TextSpan(
           text: matchText,
           style: TextStyle(color: color, fontFamily: 'monospace', fontSize: 14),
