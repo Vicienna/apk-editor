@@ -35,8 +35,20 @@ jobs:
         run: |
           echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
 
-      - name: Build APK
-        run: flutter build apk --release
+      - name: Build APK (Bypass Path Check)
+        run: |
+          # Jalankan build, jika Flutter menganggap gagal hanya karena salah jalur, tetap lanjutkan script
+          flutter build apk --release || true
+          
+          # Validasi apakah file APK benar-benar buatan Gradle ada di suatu tempat
+          echo "--- Mencari lokasi asli file APK ---"
+          find . -name "*.apk"
+          
+          # Jika tidak ada APK sama sekali yang terbentuk, barulah gagalkan workflow
+          if [ -z "$(find . -name '*.apk' -not -path '*/intermediates/*')" ]; then
+            echo "Eror: Gradle benar-benar gagal membuat APK!"
+            exit 1
+          fi
 
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v2
@@ -45,6 +57,8 @@ jobs:
           name: Release v${{ github.run_number }}
           draft: false
           prerelease: false
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: |
+            build/app/outputs/flutter-apk/*.apk
+            android/app/build/outputs/apk/release/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
