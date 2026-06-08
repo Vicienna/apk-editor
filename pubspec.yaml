@@ -14,7 +14,7 @@ dependencies:
   http: ^1.1.0
   # flutter_secure_storage dihapus karena bikin build gagal
   # code_field dihapus untuk menghindari build error
-  highlight: ^0.7.0
+  # highlight: ^0.7.0  <-- DIHAPUS (sudah pakai regex manual)
   flutter_colorpicker: ^1.0.0
 
 dev_dependencies:
