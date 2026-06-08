@@ -42,6 +42,9 @@ jobs:
             echo -e "\nflutter {\n    source '../..'\n}" >> android/app/build.gradle
           fi
 
+      - name: Clean Old Icons
+        run: rm -rf android/app/src/main/res/mipmap-*
+
       - name: Generate App Icons
         run: flutter pub run flutter_launcher_icons:main
 
